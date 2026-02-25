@@ -20,6 +20,7 @@ let textEl = null;
 let locationEl = null;
 let statsEl = null;
 let hideTimeline = null;
+let skipBtnEl = null;
 
 // Video preload cache: { url: HTMLVideoElement }
 const videoCache = new Map();
@@ -45,6 +46,7 @@ function ensureDOM() {
       <div class="event-overlay-text" id="eo-text"></div>
       <div class="event-overlay-stats" id="eo-stats"></div>
     </div>
+    <button class="eo-skip-btn" id="eo-skip">Skip ▶▶</button>
   `;
   document.body.appendChild(overlayEl);
 
@@ -57,6 +59,18 @@ function ensureDOM() {
   textEl = document.getElementById('eo-text');
   locationEl = document.getElementById('eo-location');
   statsEl = document.getElementById('eo-stats');
+  skipBtnEl = document.getElementById('eo-skip');
+}
+
+/**
+ * Set the skip button handler (called from main.js).
+ */
+export function setSkipHandler(fn) {
+  ensureDOM();
+  skipBtnEl.onclick = (e) => {
+    e.stopPropagation();
+    fn();
+  };
 }
 
 /**

@@ -15,7 +15,7 @@ import { initTimeline, resetTimeline, updateTimeline } from './components/timeli
 import { updateCompass, initCompassTicks } from './components/compass.js';
 import { typewriteQuote } from './components/typewriter.js';
 import { toggleAudio, isAudioEnabled, playChime, playWhoosh, playFanfare, playTrainSound, playSteamerSound, stopTransportSound } from './components/audio.js';
-import { showEvent, hideEvent, preloadVideo } from './components/eventOverlay.js';
+import { showEvent, hideEvent, preloadVideo, setSkipHandler } from './components/eventOverlay.js';
 import { triggerMoodEffect, showLetterbox, hideLetterbox } from './components/screenEffects.js';
 import { preloadImage, preloadAhead } from './components/imagePreloader.js';
 import { playNarration, stopNarration, preloadNarration, getNarrationDuration } from './components/narrator.js';
@@ -128,9 +128,12 @@ function initApp() {
   // Keyboard controls
   document.addEventListener('keydown', handleKeyboard);
 
-  // Click anywhere to dismiss event overlay
+  // Skip button on event overlay → advance to next stop
+  setSkipHandler(() => { stopAutoPlay(); nextStop(); });
+
+  // Click overlay background to dismiss (but not the skip button)
   document.addEventListener('click', (e) => {
-    if (isTransitioning && e.target.closest('#event-overlay')) {
+    if (isTransitioning && e.target.closest('#event-overlay') && !e.target.closest('.eo-skip-btn')) {
       cancelTransition();
     }
   });
@@ -272,7 +275,7 @@ function cancelTransition() {
 // NAVIGATION HELPERS
 // ═══════════════════════════════════════════════
 function nextStop() {
-  if (isTransitioning) return;
+  if (isTransitioning) cancelTransition();
   if (currentStopIndex < activeStops.length - 1) {
     goToStop(currentStopIndex + 1);
   } else {

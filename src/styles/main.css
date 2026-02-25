@@ -681,6 +681,30 @@ html, body {
   margin: 0 0.2rem;
 }
 
+/* ─── Skip Button ─── */
+.eo-skip-btn {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s, background 0.3s, border-color 0.3s;
+  z-index: 10;
+  letter-spacing: 0.05em;
+}
+.eo-skip-btn:hover {
+  opacity: 1;
+  background: rgba(201, 168, 76, 0.15);
+  border-color: var(--gold);
+}
+
 /* ─── Mood Gradient Overlays (tint the photo per mood) ─── */
 .mood-triumph .eo-gradient {
   background: radial-gradient(ellipse at center, rgba(201, 168, 76, 0.15) 0%, rgba(13, 11, 8, 0.75) 50%, rgba(13, 11, 8, 0.92) 100%);
