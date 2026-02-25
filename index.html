@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Around the World in 80 Days — Interactive Journey</title>
+  <meta name="description" content="An immersive 3D globe experience tracing Phileas Fogg's legendary journey. Built with Three.js and Globe.gl." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>" />
+</head>
+<body>
+  <!-- Film Grain Overlay -->
+  <div id="grain-overlay" aria-hidden="true"></div>
+
+  <!-- Vignette Overlay -->
+  <div id="vignette-overlay" aria-hidden="true"></div>
+
+  <!-- Cinematic Letterbox Bars -->
+  <div id="letterbox-top" class="letterbox-bar" aria-hidden="true"></div>
+  <div id="letterbox-bottom" class="letterbox-bar" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--              OPENING CINEMATIC              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="cinematic">
+    <div class="cinematic-bg-globe" id="cinematic-globe"></div>
+    <div class="cinematic-overlay"></div>
+    <div class="cinematic-content">
+      <div class="ornament-line">
+        <span class="ornament-diamond">◆</span>
+        <span class="ornament-dash"></span>
+        <span class="ornament-diamond">◆</span>
+        <span class="ornament-dash"></span>
+        <span class="ornament-diamond">◆</span>
+      </div>
+      <h1 class="cinematic-title">
+        <span class="title-line title-line-1">Around the World</span>
+        <span class="title-line title-in">in</span>
+        <span class="title-line title-days">Eighty Days</span>
+      </h1>
+      <div class="cinematic-author">
+        <span class="author-dash"></span>
+        <span>Jules Verne · 1872</span>
+        <span class="author-dash"></span>
+      </div>
+      <div class="cinematic-quote" id="cinematic-quote"></div>
+      <div class="cinematic-cursor" id="cinematic-cursor">|</div>
+      <div class="cinematic-buttons">
+        <button id="start-journey" class="start-btn">
+          <span class="btn-ornament-left">❖</span>
+          <span class="start-btn-text">Begin the Journey</span>
+          <span class="btn-ornament-right">❖</span>
+        </button>
+        <button id="start-demo" class="start-btn demo-btn">
+          <span class="btn-ornament-left">⚡</span>
+          <span class="start-btn-text">5-Stop Highlights</span>
+          <span class="btn-ornament-right">⚡</span>
+        </button>
+      </div>
+      <div class="ornament-line bottom">
+        <span class="ornament-diamond">◆</span>
+        <span class="ornament-dash"></span>
+        <span class="ornament-diamond">◆</span>
+        <span class="ornament-dash"></span>
+        <span class="ornament-diamond">◆</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--                 MAIN APP                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="app" class="hidden">
+    <!-- 3D Globe (full-screen background) -->
+    <div id="globe-container"></div>
+
+    <!-- Compass Rose (top-right) -->
+    <div id="compass-container">
+      <svg id="compass-rose" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.5"/>
+        <g id="compass-ticks" opacity="0.4"></g>
+        <g id="compass-star">
+          <polygon points="100,12 106,85 100,75 94,85" fill="#c9a84c" opacity="0.9"/>
+          <polygon points="188,100 115,94 125,100 115,106" fill="#c9a84c" opacity="0.7"/>
+          <polygon points="100,188 94,115 100,125 106,115" fill="#c9a84c" opacity="0.7"/>
+          <polygon points="12,100 85,106 75,100 85,94" fill="#c9a84c" opacity="0.7"/>
+          <polygon points="162,38 112,90 118,88 120,82" fill="#8a7234" opacity="0.6"/>
+          <polygon points="162,162 112,110 118,112 120,118" fill="#8a7234" opacity="0.6"/>
+          <polygon points="38,162 88,112 82,118 80,112" fill="#8a7234" opacity="0.6"/>
+          <polygon points="38,38 90,88 82,82 88,80" fill="#8a7234" opacity="0.6"/>
+        </g>
+        <text x="100" y="28" text-anchor="middle" fill="#e8d48b" font-family="'IM Fell English SC'" font-size="14" font-weight="bold">N</text>
+        <text x="178" y="104" text-anchor="middle" fill="#c9a84c" font-family="'IM Fell English SC'" font-size="11">E</text>
+        <text x="100" y="183" text-anchor="middle" fill="#c9a84c" font-family="'IM Fell English SC'" font-size="11">S</text>
+        <text x="22" y="104" text-anchor="middle" fill="#c9a84c" font-family="'IM Fell English SC'" font-size="11">W</text>
+        <circle cx="100" cy="100" r="6" fill="#1a1510" stroke="#c9a84c" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="2.5" fill="#c9a84c"/>
+        <g id="compass-needle" transform-origin="100 100">
+          <line x1="100" y1="100" x2="100" y2="35" stroke="#e8d48b" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="100,35 96,50 104,50" fill="#e8d48b"/>
+        </g>
+      </svg>
+      <div class="compass-label" id="compass-bearing">000°</div>
+    </div>
+
+    <!-- Top Bar — Urgency Counter -->
+    <div id="top-bar">
+      <div id="urgency-counter">
+        <span id="urgency-number">79</span>
+        <span class="urgency-label">DAYS REMAINING</span>
+      </div>
+      <div class="top-bar-divider"></div>
+      <div id="current-location">
+        <span id="location-emoji">🏛️</span>
+        <span id="location-name">London, England</span>
+      </div>
+      <div class="top-bar-divider"></div>
+      <div id="transport-display">
+        <span id="transport-emoji">🚂</span>
+        <span id="transport-label">Departing</span>
+      </div>
+      <div class="top-bar-divider"></div>
+      <button id="sound-toggle" class="sound-btn" title="Toggle sound (M)">
+        <span id="sound-icon">🔇</span>
+      </button>
+    </div>
+
+    <!-- Narrative Bar (compact bottom bar — replaces side panel) -->
+    <div id="narrative-bar">
+      <div class="narrative-content">
+        <div class="narrative-header">
+          <span id="narrative-city" class="narrative-city">London</span>
+          <span id="narrative-day" class="narrative-day">Day 1</span>
+          <span id="narrative-transport" class="narrative-transport">🚂</span>
+        </div>
+        <div class="narrative-text-wrap">
+          <p id="narrative-text" class="typewriter-target"></p>
+          <span id="narrative-cursor" class="typewriter-cursor">▌</span>
+        </div>
+      </div>
+      <button id="narrative-toggle" class="narrative-toggle-btn" title="Expand/collapse">▼</button>
+    </div>
+
+    <!-- Full Journey Banner (shown at demo end) -->
+    <div id="full-journey-banner" class="hidden">
+      <span class="fjb-text">Enjoyed the highlights?</span>
+      <button id="full-journey-btn" class="fjb-btn">See the full 14-stop journey <span class="fjb-arrow">→</span></button>
+    </div>
+
+    <!-- Timeline (Bottom) -->
+    <div id="timeline-container">
+      <div id="timeline">
+        <div id="timeline-track">
+          <div id="timeline-progress"></div>
+          <div id="timeline-thumb"></div>
+        </div>
+        <div id="timeline-stops"></div>
+      </div>
+      <div id="controls">
+        <button id="btn-prev" class="control-btn" title="Previous stop (←)">◀◀</button>
+        <button id="btn-play" class="control-btn play-btn" title="Play/Pause (Space)">▶</button>
+        <button id="btn-next" class="control-btn" title="Next stop (→)">▶▶</button>
+        <span class="controls-hint">Space to play · Arrow keys to navigate · Click anywhere to dismiss</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
