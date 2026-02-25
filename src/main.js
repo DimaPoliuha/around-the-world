@@ -1,6 +1,13 @@
 import './styles/main.css';
 import confetti from 'canvas-confetti';
-import journeyData from './data/journey.json';
+import _journeyData from './data/journey.json';
+
+// Prefix local asset URLs with Vite's base path (for GitHub Pages)
+const base = import.meta.env.BASE_URL;
+const journeyData = _journeyData.map(stop => ({
+  ...stop,
+  narrationUrl: stop.narrationUrl ? base + stop.narrationUrl.replace(/^\//, '') : stop.narrationUrl,
+}));
 import { initGlobe, initCinematicGlobe, flyToLocation, flyToArc, updateArcs, setRingAtStop, animateTransport, showTransportAtStop, clearTransport } from './components/globe3d.js';
 import { updateDayCounter, setDayInstant } from './components/dayCounter.js';
 import { initStoryPanel, updateStoryPanel, expandPanel, updateLocationDisplay, hideNarrativeBar, showNarrativeBar } from './components/storyPanel.js';
